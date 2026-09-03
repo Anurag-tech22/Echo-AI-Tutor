@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { ViewType } from './components/Sidebar';
@@ -21,9 +21,24 @@ import { GlobalModals } from './components/ui-layer/Modals';
 import { Toast } from './components/ui-layer/Toast';
 import { AICopilot } from './components/AICopilot';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { CommandPalette } from './components/CommandPalette';
+import { PerformanceHUD } from './components/PerformanceHUD';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewType>('home');
+  const [isCmdKOpen, setIsCmdKOpen] = useState(false);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCmdKOpen(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   const renderView = () => {
     switch(currentView) {
@@ -59,6 +74,12 @@ export default function App() {
         <GlobalModals />
         <Toast />
         <AICopilot />
+        <PerformanceHUD />
+        <CommandPalette 
+          isOpen={isCmdKOpen} 
+          onClose={() => setIsCmdKOpen(false)} 
+          onSelectView={setCurrentView} 
+        />
       </UIProvider>
     </ErrorBoundary>
   );

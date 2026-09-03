@@ -56,10 +56,21 @@ export function Topbar() {
           )}
         </div>
 
-        <div className="hidden sm:flex items-center gap-4">
+        <div className="hidden sm:flex items-center gap-3">
+          <button
+            onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
+            className="hidden lg:flex items-center gap-2 bg-slate-900/90 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-full text-xs text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+            title="Global Command Center (Ctrl+K or Cmd+K)"
+          >
+            <span>Command Center</span>
+            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px] text-slate-300">
+              ⌘K
+            </kbd>
+          </button>
+
           <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-xs font-medium text-emerald-400 select-none">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Gemini 3.6 Engine Online</span>
+            <span>Gemini 3.6 Online</span>
           </div>
 
           <button onClick={() => showToast("You've earned 150 XP today!")} className="flex items-center gap-2 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-full px-4 py-2 transition-colors">
