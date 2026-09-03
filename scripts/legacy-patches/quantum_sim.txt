@@ -1,0 +1,107 @@
+function QuantumSim() {
+  const [state, setState] = useState<'superposition' | '0' | '1'>('superposition');
+  const [rotationSpeed, setRotationSpeed] = useState(0.02);
+
+  const measure = () => {
+    setState(Math.random() > 0.5 ? '1' : '0');
+    setRotationSpeed(0);
+  };
+  
+  const reset = () => {
+    setState('superposition');
+    setRotationSpeed(0.02);
+  };
+
+  const Qubit = () => {
+    const groupRef = useRef<THREE.Group>(null!);
+    
+    useFrame(() => {
+      if (groupRef.current && state === 'superposition') {
+        groupRef.current.rotation.x += rotationSpeed;
+        groupRef.current.rotation.y += rotationSpeed * 1.5;
+        groupRef.current.rotation.z += rotationSpeed * 0.5;
+      } else if (groupRef.current) {
+         // Smoothly lerp to measured state
+         groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, 0, 0.1);
+         groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, 0, 0.1);
+         groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, 0, 0.1);
+      }
+    });
+
+    return (
+      <group ref={groupRef}>
+        <mesh>
+          <sphereGeometry args={[1, 32, 32]} />
+          <meshStandardMaterial 
+            color={state === '1' ? '#4f46e5' : state === '0' ? '#e11d48' : '#a855f7'} 
+            emissive={state === '1' ? '#4338ca' : state === '0' ? '#be123c' : '#7e22ce'} 
+            emissiveIntensity={state === 'superposition' ? 1 : 0.5} 
+            wireframe={state === 'superposition'}
+            transparent
+            opacity={0.8}
+          />
+        </mesh>
+        
+        {state === 'superposition' && (
+          <>
+            <mesh rotation={[Math.PI/2, 0, 0]}>
+              <torusGeometry args={[1.5, 0.02, 16, 100]} />
+              <meshBasicMaterial color="#38bdf8" />
+            </mesh>
+            <mesh rotation={[0, Math.PI/2, 0]}>
+              <torusGeometry args={[1.5, 0.02, 16, 100]} />
+              <meshBasicMaterial color="#c084fc" />
+            </mesh>
+            <mesh rotation={[0, 0, Math.PI/2]}>
+              <torusGeometry args={[1.5, 0.02, 16, 100]} />
+              <meshBasicMaterial color="#fb7185" />
+            </mesh>
+          </>
+        )}
+      </group>
+    );
+  };
+
+  return (
+    <>
+      <AINarrator text="The particle exists in a probabilistic superposition of both State 0 and State 1 simultaneously. The act of measurement collapses the wave function into a single definite outcome." />
+      
+      <div className="flex-1 bg-black rounded-xl border border-slate-800/50 mb-5 relative flex items-center justify-center overflow-hidden min-h-[350px]">
+        <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+          <color attach="background" args={['#020617']} />
+          <ambientLight intensity={0.2} />
+          <pointLight position={[10, 10, 10]} intensity={100} color="#a855f7" />
+          <pointLight position={[-10, -10, -10]} intensity={50} color="#38bdf8" />
+          
+          <Stars radius={100} depth={50} count={1000} factor={4} saturation={0} fade speed={state === 'superposition' ? 1 : 0} />
+          
+          <Qubit />
+          
+          <OrbitControls enableZoom={false} enablePan={false} autoRotate={state !== 'superposition'} autoRotateSpeed={2} />
+        </Canvas>
+
+        {state !== 'superposition' && (
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-black text-white text-6xl drop-shadow-[0_0_20px_rgba(255,255,255,1)] z-10 pointer-events-none">
+             {state}
+           </div>
+        )}
+      </div>
+
+      <div className="shrink-0 flex items-center justify-center gap-4 py-2">
+        <button 
+          onClick={measure} 
+          disabled={state !== 'superposition'}
+          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)]"
+        >
+          <Eye className="w-5 h-5" /> Measure State
+        </button>
+        <button 
+          onClick={reset}
+          className="flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold transition-all border border-slate-700"
+        >
+          <RotateCcw className="w-5 h-5" /> Reset
+        </button>
+      </div>
+    </>
+  );
+}
