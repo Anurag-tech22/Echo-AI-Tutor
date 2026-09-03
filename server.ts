@@ -1,7 +1,7 @@
 import express from "express";
-import path from "path";
+import * as path from "path";
 import { createServer as createViteServer } from "vite";
-import http from "http";
+import * as http from "http";
 import { Server } from "socket.io";
 import { GoogleGenAI } from "@google/genai";
 import * as dotenv from "dotenv";
