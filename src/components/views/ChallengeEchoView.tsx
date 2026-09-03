@@ -138,7 +138,7 @@ export function ChallengeEchoView() {
           <h1 className="text-3xl font-bold text-white mb-1 flex items-center gap-3">
             Challenge ECHO
             <span className="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-mono">
-              v3.6 Neural Streaming
+              Neural Streaming Core
             </span>
           </h1>
           <p className="text-slate-400 text-sm">Dialectic interrogation engine stress-testing student mental models.</p>

@@ -103,7 +103,7 @@ export function PerformanceHUD() {
             </div>
             <div className="flex items-center justify-between gap-4">
               <span className="text-slate-500">ENGINE:</span>
-              <span className="text-emerald-400">Gemini 3.6 Flash</span>
+              <span className="text-emerald-400">ECHO Neural Core</span>
             </div>
             <div className="flex items-center justify-between gap-4">
               <span className="text-slate-500">SOLVER:</span>

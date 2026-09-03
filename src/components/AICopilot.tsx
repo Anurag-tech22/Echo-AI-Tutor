@@ -145,7 +145,7 @@ export function AICopilot() {
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-white">ECHO Copilot</h3>
-                  <p className="text-xs text-indigo-400/80">Gemini 3.6 Neural Voice</p>
+                  <p className="text-xs text-indigo-400/80">Neural Voice System</p>
                 </div>
               </div>
               

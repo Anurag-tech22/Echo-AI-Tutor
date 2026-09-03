@@ -70,7 +70,7 @@ export function Topbar() {
 
           <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-xs font-medium text-emerald-400 select-none">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Gemini 3.6 Online</span>
+            <span>ECHO Core Online</span>
           </div>
 
           <button onClick={() => showToast("You've earned 150 XP today!")} className="flex items-center gap-2 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-full px-4 py-2 transition-colors">

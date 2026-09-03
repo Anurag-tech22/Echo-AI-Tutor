@@ -110,7 +110,7 @@ async function startServer() {
       status: "ready",
       service: "echo-ai-tutor",
       environment: process.env.NODE_ENV || "development",
-      aiEngine: hasKey ? "google-gemini-3.6-flash" : "simulated-heuristic-mode",
+      aiEngine: hasKey ? "echo-neural-core" : "simulated-heuristic-mode",
       memory: {
         heapUsedMB: Math.round(memory.heapUsed / 1024 / 1024),
         heapTotalMB: Math.round(memory.heapTotal / 1024 / 1024),
