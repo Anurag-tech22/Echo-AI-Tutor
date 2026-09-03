@@ -1,20 +1,25 @@
+<p align="center">
+  <img src="docs/assets/banner.png" alt="ECHO AI Tutor — Shaping the Future of Knowledge" width="100%" />
+</p>
+
 # 🔮 ECHO: AI Tutor
 ### *Evaluative Cognitive Heuristic Oracle — Predictive Socratic Learning Engine & Interactive 3D Cognitive Simulations*
 
 <div align="center">
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![CI](https://github.com/Anurag-tech22/Echo-AI-Tutor/actions/workflows/ci.yml/badge.svg)](https://github.com/Anurag-tech22/Echo-AI-Tutor/actions)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![React](https://img.shields.io/badge/React-19.0.1-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Google Gemini](https://img.shields.io/badge/Google%20Gemini-2.5%20Flash-8E75B2?logo=googlegemini&logoColor=white)](https://ai.google.dev/)
 [![Three.js](https://img.shields.io/badge/Three.js-0.185-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![Socket.io](https://img.shields.io/badge/Socket.io-4.8.3-010101?logo=socketdotio&logoColor=white)](https://socket.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Vite](https://img.shields.io/badge/Vite-6.2-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **Stop Memorizing. Start Reasoning. Stress-Test Your Mental Models in Real-Time 3D.**
 
-[Key Features](#-key-features) • [Architecture](#-system-architecture) • [Socratic Learning Loop](#-the-socratic-cognitive-learning-loop) • [3D Simulations](#-interactive-3d-simulation-suite) • [Getting Started](#-getting-started) • [API & WebSockets](#-api--websocket-protocol)
+[Key Features](#-key-features) • [Architecture](#-system-architecture) • [Socratic Learning Loop](#-the-socratic-cognitive-learning-loop) • [3D Simulations](#-interactive-3d-simulation-suite) • [Getting Started](#-getting-started) • [Contributing](CONTRIBUTING.md)
 
 ---
 
@@ -205,17 +210,25 @@ ECHO includes **10 hardware-accelerated interactive simulations** built using **
 
 ```
 echo/
-├── public/                     # Static assets and icons
-├── scripts/
-│   └── legacy-patches/         # Archived migration & patch scripts
+├── .github/
+│   ├── workflows/
+│   │   └── ci.yml              # GitHub Actions CI pipeline
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── bug_report.md       # Standardized bug reporting
+│   │   └── feature_request.md  # Simulation & feature proposals
+│   └── PULL_REQUEST_TEMPLATE.md
+├── docs/
+│   └── assets/
+│       └── banner.png          # High-resolution project artwork
+├── public/                     # Static WebGL assets & icons
 ├── src/
 │   ├── components/
-│   │   ├── dashboard/          # Dashboard & simulation modules
+│   │   ├── dashboard/          # Cognitive modules & 3D simulators
 │   │   │   ├── Counterexample.tsx
 │   │   │   ├── Dashboard.tsx
 │   │   │   ├── FutureMistakeForecast.tsx
 │   │   │   ├── LearningLoop.tsx
-│   │   │   ├── LiveSimulation.tsx       # 10 3D interactive simulations
+│   │   │   ├── LiveSimulation.tsx       # 10 hardware-accelerated 3D simulations
 │   │   │   ├── MistakeLab.tsx
 │   │   │   ├── ProofOfUnderstanding.tsx
 │   │   │   ├── ReasoningXRay.tsx
@@ -249,9 +262,13 @@ echo/
 │   └── types.ts                # TypeScript domain models
 ├── .env.example                # Sample environment variables
 ├── .gitignore                  # Git ignore rules
+├── CODE_OF_CONDUCT.md          # Contributor Covenant v2.1
+├── CONTRIBUTING.md            # Developer setup & guidelines
 ├── index.html                  # HTML5 entry with metadata
+├── LICENSE                     # Apache-2.0 open-source license
 ├── metadata.json               # Application capability metadata
 ├── package.json                # Project dependencies and npm scripts
+├── SECURITY.md                 # Vulnerability disclosure policy
 ├── server.ts                   # Express + Socket.io + Gemini API server
 ├── tsconfig.json               # TypeScript compiler configuration
 └── vite.config.ts              # Vite + Tailwind CSS plugin config
@@ -346,6 +363,18 @@ Sends conversation history to the Gemini 2.5 Flash Socratic engine.
 | `sim_param_update` | Server $\to$ Client | `params: object` | Broadcasts parameter changes to other peers |
 | `cursor_move` | Client $\to$ Server | `{ room: string, cursor: { x, y } }` | Transmits mouse pointer coordinate |
 | `remote_cursor` | Server $\to$ Client | `{ id: string, cursor: { x, y } }` | Displays peer cursor position in real-time |
+
+---
+
+## 🤝 Community & Contributing
+
+Contributions make the open-source community an inspiring place to learn, inspire, and create. Any contributions you make are **greatly appreciated**!
+
+- 📖 Please read our [Contributing Guidelines](CONTRIBUTING.md) to get started with local development.
+- 📜 Review our [Code of Conduct](CODE_OF_CONDUCT.md) to understand our community standards.
+- 🔒 For security vulnerabilities, review our [Security Policy](SECURITY.md).
+- 💡 Have an idea for a new 3D simulation? Submit a [Feature Proposal](https://github.com/Anurag-tech22/Echo-AI-Tutor/issues/new?template=feature_request.md).
+- 🐛 Found a bug? Open a [Bug Report](https://github.com/Anurag-tech22/Echo-AI-Tutor/issues/new?template=bug_report.md).
 
 ---
 
