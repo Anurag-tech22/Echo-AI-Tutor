@@ -11,7 +11,7 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![React](https://img.shields.io/badge/React-19.0.1-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Google Gemini](https://img.shields.io/badge/Google%20Gemini-2.5%20Flash-8E75B2?logo=googlegemini&logoColor=white)](https://ai.google.dev/)
+[![Google Gemini](https://img.shields.io/badge/Google%20Gemini-3.6%20Flash-8E75B2?logo=googlegemini&logoColor=white)](https://ai.google.dev/)
 [![Three.js](https://img.shields.io/badge/Three.js-0.185-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![Socket.io](https://img.shields.io/badge/Socket.io-4.8.3-010101?logo=socketdotio&logoColor=white)](https://socket.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
@@ -29,7 +29,7 @@
 
 Most educational tools and AI chatbots act as **passive answer engines** — students paste in problems, receive instant solutions, and develop an **illusion of competence**. When presented with slight variations or counterintuitive physical edge-cases, their mental models crumble.
 
-**ECHO (Evaluative Cognitive Heuristic Oracle)** transforms AI from a passive oracle into an **adversarial, Socratic intellectual sparring partner**. Powered by **Google Gemini 2.5 Flash** and backed by **interactive Three.js 3D physics simulators**, ECHO doesn't spoon-feed answers:
+**ECHO (Evaluative Cognitive Heuristic Oracle)** transforms AI from a passive oracle into an **adversarial, Socratic intellectual sparring partner**. Powered by **Google Gemini 3.6 Flash** and backed by **interactive Three.js 3D physics simulators**, ECHO doesn't spoon-feed answers:
 1. **Diagnoses Mental Models**: It listens to how you articulate concepts to detect hidden misconceptions.
 2. **Forecasts Failures**: It predicts exactly which future problems you will fail based on conceptual fragility.
 3. **Challenges with Counterexamples**: It constructs empirical, 3D simulations where your flawed logic breaks before your eyes.
@@ -56,7 +56,7 @@ flowchart TD
     end
 
     subgraph Phase3["3. Socratic Interrogation & Stress Testing"]
-        G --> H[Gemini 2.5 Socratic Intervention]
+        G --> H[Gemini 3.6 Socratic Intervention]
         H --> I[Generate Counterexample Hypothesis]
         I --> J[Launch Targeted 3D Interactive Simulation]
     end
@@ -107,7 +107,7 @@ graph TB
     end
 
     subgraph AI["Intelligence & Foundation Models"]
-        GeminiClient["@google/genai SDK (gemini-2.5-flash)"]
+        GeminiClient["@google/genai SDK (gemini-3.6-flash)"]
         SocraticPrompt["Socratic System Instruction Engine"]
         QuotaHandler["Graceful Quota Backoff & Adaptive Fallback"]
     end
@@ -199,7 +199,7 @@ ECHO includes **10 hardware-accelerated interactive simulations** built using **
 | **3D & Graphics** | Three.js + React Three Fiber + Drei | WebGL hardware-accelerated 3D simulations & shaders |
 | **Styling** | Tailwind CSS 4 + Lucide Icons | Ultra-fast atomic CSS, responsive dark theme, modern iconography |
 | **Motion** | Motion (`motion/react`) | Fluid physics-based UI transitions and animations |
-| **AI / LLM** | Google Gemini 2.5 Flash (`@google/genai`) | High-speed, context-rich Socratic interrogation |
+| **AI / LLM** | Google Gemini 3.6 Flash (`@google/genai`) | High-speed, context-rich Socratic interrogation |
 | **Backend** | Express 4 + Node.js 24 | REST API endpoints, static distribution |
 | **Realtime WebSockets** | Socket.io 4.8 | Low-latency state sync, rooms, and cursor broadcasting |
 | **Build & Bundler** | Vite 6 + tsx + esbuild | Instant HMR development and optimized production bundles |
@@ -348,7 +348,7 @@ ECHO is configured with a native [`render.yaml`](render.yaml) for zero-configura
 ## 📡 API & WebSocket Protocol
 
 ### Socratic Chat API (`POST /api/chat`)
-Sends conversation history to the Gemini 2.5 Flash Socratic engine.
+Sends conversation history to the Gemini 3.6 Flash Socratic engine.
 
 - **URL**: `/api/chat`
 - **Method**: `POST`

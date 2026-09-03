@@ -2,7 +2,7 @@
   "name": "echo-ai-tutor",
   "private": true,
   "version": "1.0.0",
-  "description": "ECHO: Evaluative Cognitive Heuristic Oracle — Predictive Socratic Learning Engine & Interactive 3D Cognitive Simulations powered by Google Gemini 2.5",
+  "description": "ECHO: Evaluative Cognitive Heuristic Oracle — Predictive Socratic Learning Engine & Interactive 3D Cognitive Simulations powered by Google Gemini 3.6",
   "repository": {
     "type": "git",
     "url": "https://github.com/Anurag-tech22/Echo-AI-Tutor.git"

@@ -1,6 +1,6 @@
 {
   "name": "ECHO",
-  "description": "ECHO (Evaluative Cognitive Heuristic Oracle): Predictive Socratic Learning Engine & Interactive 3D Cognitive Simulations powered by Google Gemini 2.5",
+  "description": "ECHO (Evaluative Cognitive Heuristic Oracle): Predictive Socratic Learning Engine & Interactive 3D Cognitive Simulations powered by Google Gemini 3.6",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

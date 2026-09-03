@@ -79,11 +79,20 @@ async function startServer() {
       console.log("Calling Gemini API with contents:", contents);
       let responseText = "";
       let retries = 3;
+      const modelsToTry = [
+        process.env.GEMINI_MODEL,
+        "gemini-3.6-flash",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash"
+      ].filter(Boolean) as string[];
+      let modelIndex = 0;
       
-      while (retries > 0) {
+      while (retries > 0 && modelIndex < modelsToTry.length) {
+        const currentModel = modelsToTry[modelIndex];
         try {
+          console.log(`Calling Gemini API with model: ${currentModel}`);
           const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: currentModel,
             contents,
             config: {
               systemInstruction: "You are ECHO (Evaluative Cognitive Heuristic Oracle), a Socratic AI tutor. Do not just give answers. Ask probing questions to reveal flaws in the student's logic or guide them to the answer themselves. Keep your responses concise (1-3 sentences).",
@@ -95,6 +104,14 @@ async function startServer() {
           retries--;
           const errorMessage = error.message || String(error);
           
+          // If model is deprecated or not available, cascade to next supported model
+          if (errorMessage.includes('not found') || errorMessage.includes('no longer available') || errorMessage.includes('deprecated') || errorMessage.includes('404')) {
+            console.warn(`Model ${currentModel} not available, cascading to next model...`);
+            modelIndex++;
+            retries = 3;
+            continue;
+          }
+
           // Check for quota limits / 429s
           if (errorMessage.toLowerCase().includes('quota') || errorMessage.includes('429')) {
              console.log(`Gemini API Quota Exceeded (handled gracefully).`);
@@ -104,7 +121,7 @@ async function startServer() {
 
           console.warn(`Gemini API Retry Warning (retries left: ${retries}):`, errorMessage);
 
-          if (retries === 0) {
+          if (retries === 0 || modelIndex >= modelsToTry.length - 1) {
             let cleanMessage = errorMessage;
             try {
               const match = cleanMessage.match(/\{.*\}/);
