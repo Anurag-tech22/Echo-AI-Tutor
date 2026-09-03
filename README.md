@@ -212,34 +212,36 @@ ECHO includes **10 hardware-accelerated interactive simulations** built using **
 echo/
 ├── .github/
 │   ├── workflows/
-│   │   └── ci.yml              # GitHub Actions CI pipeline
-│   ├── ISSUE_TEMPLATE/
-│   │   ├── bug_report.md       # Standardized bug reporting
-│   │   └── feature_request.md  # Simulation & feature proposals
-│   └── PULL_REQUEST_TEMPLATE.md
+│   └── workflows/
+│       └── ci.yml              # Multi-step GitHub Actions CI (Typecheck, Vitest, Build)
 ├── docs/
-│   └── assets/
-│       └── banner.png          # High-resolution project artwork
-├── public/                     # Static WebGL assets & icons
+│   ├── API_SPEC.md             # OpenAPI 3.1 contract specification
+│   └── ARCHITECTURE.md         # 4-tier system design & cognitive state machine RFC
+├── tests/
+│   ├── benchmark.test.ts       # RK4 numerical energy conservation & chaos tests
+│   ├── physics.test.ts         # Trajectory, orbital, and quantum wave tests
+│   └── server.test.ts          # Server API contracts & health probe tests
 ├── src/
 │   ├── components/
-│   │   ├── dashboard/          # Cognitive modules & 3D simulators
+│   │   ├── dashboard/          # Modular dashboard cards
+│   │   │   ├── PhysicsPlayground.tsx   # Arcade slingshot gravity sandbox
 │   │   │   ├── Counterexample.tsx
 │   │   │   ├── Dashboard.tsx
 │   │   │   ├── FutureMistakeForecast.tsx
 │   │   │   ├── LearningLoop.tsx
-│   │   │   ├── LiveSimulation.tsx       # 10 hardware-accelerated 3D simulations
+│   │   │   ├── LiveSimulation.tsx
 │   │   │   ├── MistakeLab.tsx
 │   │   │   ├── ProofOfUnderstanding.tsx
 │   │   │   ├── ReasoningXRay.tsx
 │   │   │   ├── TransferChallenge.tsx
 │   │   │   ├── UnderstandingMap.tsx
 │   │   │   └── YourUnderstanding.tsx
-│   │   ├── ui-layer/           # Modals, settings, upgrade, and toasts
+│   │   ├── simulations/        # 10 3D WebGL Three.js interactive simulations
+│   │   ├── ui-layer/           # Modals, toasts, and UI primitives
 │   │   │   ├── Modals.tsx
 │   │   │   └── Toast.tsx
 │   │   ├── views/              # Dedicated full-screen domain views
-│   │   │   ├── ChallengeEchoView.tsx    # Socratic Gemini chat interface
+│   │   │   ├── ChallengeEchoView.tsx    # Socratic streaming AI interface
 │   │   │   ├── EvidenceView.tsx
 │   │   │   ├── ForecastView.tsx
 │   │   │   ├── MistakeLabView.tsx
@@ -248,32 +250,45 @@ echo/
 │   │   │   ├── SimulationsView.tsx      # Multi-simulation browser
 │   │   │   └── UnderstandingMapView.tsx
 │   │   ├── AICopilot.tsx       # Speech-enabled floating AI copilot
+│   │   ├── AudioWaveform.tsx   # Hardware-accelerated neural audio oscilloscope
+│   │   ├── CommandPalette.tsx  # Global Cmd+K fuzzy command center
+│   │   ├── ErrorBoundary.tsx   # React runtime & WebGL fault tolerance
 │   │   ├── Layout.tsx          # Responsive layout shell
+│   │   ├── PerformanceHUD.tsx  # Hardware GPU & 60 FPS monitor
 │   │   ├── PlaceholderView.tsx
 │   │   ├── Sidebar.tsx         # Navigation drawer
-│   │   └── Topbar.tsx          # Subject selector & user metrics
+│   │   └── Topbar.tsx          # Subject selector & gamified metrics
 │   ├── context/
 │   │   └── UIContext.tsx       # Toast, modal, and app state provider
 │   ├── lib/
+│   │   ├── physics/
+│   │   │   └── rk4Solver.ts    # 4th-Order Runge-Kutta numerical physics solver
+│   │   ├── confetti.ts         # High-performance celebratory particle engine
+│   │   ├── soundFx.ts          # Procedural Web Audio API sound synthesizer
 │   │   └── utils.ts            # Class merging utility (clsx + twMerge)
 │   ├── App.tsx                 # Root application router
 │   ├── index.css               # Design tokens & styles
 │   ├── main.tsx                # React DOM root entry
 │   └── types.ts                # TypeScript domain models
+├── .dockerignore               # Docker image exclusions
 ├── .env.example                # Sample environment variables
 ├── .gitignore                  # Git ignore rules
+├── .prettierrc                 # Code formatting rules
 ├── CODE_OF_CONDUCT.md          # Contributor Covenant v2.1
 ├── CONTRIBUTING.md            # Developer setup & guidelines
+├── Dockerfile                  # Multi-stage production container
+├── docker-compose.yml          # Container orchestration spec
 ├── index.html                  # HTML5 entry with metadata
 ├── LICENSE                     # Apache-2.0 open-source license
 ├── metadata.json               # Application capability metadata
 ├── package.json                # Project dependencies and npm scripts
 ├── render.yaml                 # Render Blueprint deployment specification
 ├── SECURITY.md                 # Vulnerability disclosure policy
-├── server.ts                   # Express + Socket.io + Gemini API server
+├── server.ts                   # Hardened Express + Socket.io + Gemini API server
 ├── start.cjs                   # Resilient production runner with auto-build
 ├── tsconfig.json               # TypeScript compiler configuration
-└── vite.config.ts              # Vite + Tailwind CSS plugin config
+├── vite.config.ts              # Vite + Tailwind CSS plugin config
+└── vitest.config.ts            # Vitest automated test suite runner
 ```
 
 ---

@@ -1,6 +1,12 @@
 {
   "name": "ECHO",
-  "description": "ECHO (Evaluative Cognitive Heuristic Oracle): Predictive Socratic Learning Engine & Interactive 3D Cognitive Simulations powered by Google Gemini 3.6",
+  "description": "ECHO (Evaluative Cognitive Heuristic Oracle): Predictive Socratic Learning Engine, Real-time 3D Cognitive Simulations, and High-Performance RK4 Physics Suite",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API",
+    "MAJOR_CAPABILITY_WEBGL_3D_PHYSICS",
+    "MAJOR_CAPABILITY_SOCKETIO_COLLABORATION",
+    "MAJOR_CAPABILITY_WEB_AUDIO_SYNTHESIS",
+    "MAJOR_CAPABILITY_RK4_NUMERICAL_SOLVER"
+  ]
 }
