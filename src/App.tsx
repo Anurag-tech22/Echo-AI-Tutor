@@ -20,6 +20,7 @@ import { UIProvider } from './context/UIContext';
 import { GlobalModals } from './components/ui-layer/Modals';
 import { Toast } from './components/ui-layer/Toast';
 import { AICopilot } from './components/AICopilot';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewType>('home');
@@ -50,13 +51,15 @@ export default function App() {
   };
 
   return (
-    <UIProvider>
-      <Layout currentView={currentView} onViewChange={setCurrentView}>
-        {renderView()}
-      </Layout>
-      <GlobalModals />
-      <Toast />
-      <AICopilot />
-    </UIProvider>
+    <ErrorBoundary>
+      <UIProvider>
+        <Layout currentView={currentView} onViewChange={setCurrentView}>
+          {renderView()}
+        </Layout>
+        <GlobalModals />
+        <Toast />
+        <AICopilot />
+      </UIProvider>
+    </ErrorBoundary>
   );
 }

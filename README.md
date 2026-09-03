@@ -8,18 +8,18 @@
 <div align="center">
 
 [![CI](https://github.com/Anurag-tech22/Echo-AI-Tutor/actions/workflows/ci.yml/badge.svg)](https://github.com/Anurag-tech22/Echo-AI-Tutor/actions)
+[![Tests](https://img.shields.io/badge/Tests-Vitest%20Passing-2ea44f?logo=vitest&logoColor=white)](tests)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![React](https://img.shields.io/badge/React-19.0.1-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Google Gemini](https://img.shields.io/badge/Google%20Gemini-3.6%20Flash-8E75B2?logo=googlegemini&logoColor=white)](https://ai.google.dev/)
 [![Three.js](https://img.shields.io/badge/Three.js-0.185-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
-[![Socket.io](https://img.shields.io/badge/Socket.io-4.8.3-010101?logo=socketdotio&logoColor=white)](https://socket.io/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1-38B2AC?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](Dockerfile)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **Stop Memorizing. Start Reasoning. Stress-Test Your Mental Models in Real-Time 3D.**
 
-[Key Features](#-key-features) • [Architecture](#-system-architecture) • [Socratic Learning Loop](#-the-socratic-cognitive-learning-loop) • [3D Simulations](#-interactive-3d-simulation-suite) • [Getting Started](#-getting-started) • [Contributing](CONTRIBUTING.md)
+[Key Features](#-key-features) • [Architecture](docs/ARCHITECTURE.md) • [OpenAPI Spec](docs/API_SPEC.md) • [Socratic Loop](#-the-socratic-cognitive-learning-loop) • [3D Simulations](#-interactive-3d-simulation-suite) • [Getting Started](#-getting-started) • [Contributing](CONTRIBUTING.md)
 
 ---
 
@@ -321,14 +321,29 @@ Open your browser and navigate to:
 http://localhost:3000
 ```
 
-### 5. Build for Production
+### 5. Run Automated Tests
+Execute the Vitest simulation physics & API contract test suites:
+```bash
+npm test
+# Or watch mode: npm run test:watch
+```
+
+### 6. Run with Docker
+ECHO includes a production-hardened multi-stage Docker container:
+```bash
+# Build and boot container locally
+docker compose up --build
+```
+The health check will monitor `http://localhost:3000/healthz` automatically.
+
+### 7. Build for Production
 To generate an optimized bundle and run the compiled server:
 ```bash
 npm run build
 npm start
 ```
 
-### 6. Deploy to Render
+### 8. Deploy to Render
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com)
 

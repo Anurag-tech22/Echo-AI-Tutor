@@ -8,6 +8,7 @@ on:
 
 jobs:
   build-and-test:
+    name: Build, Lint & Automated Test Suite
     runs-on: ubuntu-latest
 
     steps:
@@ -25,5 +26,14 @@ jobs:
     - name: Run TypeScript Typecheck
       run: bun run lint
 
-    - name: Build production bundle
+    - name: Run Vitest Physics & API Tests
+      run: bun run test
+
+    - name: Build Production Bundle
       run: bun run build
+
+    - name: Verify Production Distribution Artifacts
+      run: |
+        test -f dist/server.cjs || exit 1
+        test -f dist/index.html || exit 1
+        echo "All production artifacts validated successfully!"

@@ -8,118 +8,216 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
+const START_TIME = Date.now();
+
+// In-memory sliding-window rate limiter for production safety
+interface RateLimitRecord {
+  count: number;
+  resetTime: number;
+}
+const rateLimitMap = new Map<string, RateLimitRecord>();
+
+function checkRateLimit(ip: string, limit = 30, windowMs = 60000): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
+    return { allowed: true, remaining: limit - 1 };
+  }
+
+  if (record.count >= limit) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  record.count += 1;
+  return { allowed: true, remaining: limit - record.count };
+}
+
 async function startServer() {
   const app = express();
   const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
   const httpServer = http.createServer(app);
-  const io = new Server(httpServer, { cors: { origin: "*" } });
+  const io = new Server(httpServer, {
+    cors: { origin: "*" },
+    transports: ["websocket", "polling"],
+  });
 
+  // Structured Logging Middleware
+  app.use((req, res, next) => {
+    const startTime = Date.now();
+    res.on("finish", () => {
+      const duration = Date.now() - startTime;
+      const logData = {
+        time: new Date().toISOString(),
+        method: req.method,
+        path: req.originalUrl || req.url,
+        status: res.statusCode,
+        durationMs: duration,
+        ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
+      };
+      if (res.statusCode >= 500) {
+        console.error("[ERROR]", JSON.stringify(logData));
+      } else if (res.statusCode >= 400) {
+        console.warn("[WARN]", JSON.stringify(logData));
+      } else if (!req.url.startsWith("/assets/") && !req.url.startsWith("/@")) {
+        console.log("[INFO]", JSON.stringify(logData));
+      }
+    });
+    next();
+  });
+
+  // Socket.io Real-time Collaborative State Relay
   io.on("connection", (socket) => {
-    socket.on("join_sim", (room) => {
+    socket.on("join_sim", (room: string) => {
       socket.join(room);
       const clients = io.sockets.adapter.rooms.get(room)?.size || 1;
       io.to(room).emit("user_count", clients);
     });
 
-    socket.on("sim_param_change", ({ room, params }) => {
+    socket.on("sim_param_change", ({ room, params }: { room: string; params: any }) => {
       socket.to(room).emit("sim_param_update", params);
     });
 
-    socket.on("cursor_move", ({ room, cursor }) => {
+    socket.on("cursor_move", ({ room, cursor }: { room: string; cursor: any }) => {
       socket.to(room).emit("remote_cursor", { id: socket.id, cursor });
     });
-    
+
     socket.on("disconnect", () => {
-       // Optional cleanup
+      // Automatic socket cleanup
     });
   });
-  
 
-  app.use(express.json());
+  app.use(express.json({ limit: "1mb" }));
 
-  // AI client will be initialized per-request if the key exists
-  
-  // API Routes
+  // ==========================================
+  // Health & Observability Probes (Google Cloud / Kubernetes / Render)
+  // ==========================================
+  app.get("/healthz", (_req, res) => {
+    res.status(200).json({
+      status: "healthy",
+      service: "echo-ai-tutor",
+      uptimeSeconds: Math.floor((Date.now() - START_TIME) / 1000),
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  app.get("/readyz", (_req, res) => {
+    const memory = process.memoryUsage();
+    const hasKey = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim().length > 0);
+    res.status(200).json({
+      status: "ready",
+      service: "echo-ai-tutor",
+      environment: process.env.NODE_ENV || "development",
+      aiEngine: hasKey ? "google-gemini-3.6-flash" : "simulated-heuristic-mode",
+      memory: {
+        heapUsedMB: Math.round(memory.heapUsed / 1024 / 1024),
+        heapTotalMB: Math.round(memory.heapTotal / 1024 / 1024),
+        rssMB: Math.round(memory.rss / 1024 / 1024),
+      },
+    });
+  });
+
+  // ==========================================
+  // Socratic Chat API Route with Gemini 3.6 Flash
+  // ==========================================
   app.post("/api/chat", async (req, res) => {
-    console.log("Received chat request:", req.body);
-    
+    const clientIp = (req.headers["x-forwarded-for"] as string) || req.socket.remoteAddress || "unknown";
+    const { allowed, remaining } = checkRateLimit(clientIp, 40, 60000);
+    res.setHeader("X-RateLimit-Remaining", remaining);
+
+    if (!allowed) {
+      return res.status(429).json({
+        error: "Rate limit exceeded. Please wait a minute before submitting more questions.",
+      });
+    }
+
+    const { messages } = req.body;
+
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: "Invalid request: messages array is required." });
+    }
+
+    if (messages.length > 60) {
+      return res.status(400).json({ error: "Conversation history exceeds maximum allowable turns (60)." });
+    }
+
     // Fallback if API key is not configured
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.trim() === '') {
-      console.log("No API key configured. Providing fallback simulated response.");
-      // Provide a generic Socratic response
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.trim() === "") {
       const fallbacks = [
         "That's an interesting point. Can you elaborate on why you think that is the case?",
         "What evidence supports that conclusion?",
         "If we assume that's true, what would be the logical next step?",
-        "How does that concept connect to what we discussed earlier?",
-        "Can you think of any exceptions to that rule?"
+        "How does that concept connect to what we observed in the 3D simulation?",
+        "Can you think of any physical counterexamples to that rule?",
       ];
       const randomResponse = fallbacks[Math.floor(Math.random() * fallbacks.length)];
       return res.json({ text: `*(Simulated Mode - No API Key)* ${randomResponse}` });
     }
 
     try {
-      const { messages } = req.body;
-      
       const ai = new GoogleGenAI({
         apiKey: process.env.GEMINI_API_KEY as string,
         httpOptions: {
           headers: {
-            'User-Agent': 'aistudio-build',
-          }
-        }
+            "User-Agent": "echo-ai-tutor/1.0.0",
+          },
+        },
       });
-      
+
       const contents = messages.map((m: any) => ({
-        role: m.role === 'user' ? 'user' : 'model',
-        parts: [{ text: m.content }]
+        role: m.role === "user" ? "user" : "model",
+        parts: [{ text: String(m.content || "").slice(0, 4000) }],
       }));
 
-      console.log("Calling Gemini API with contents:", contents);
       let responseText = "";
       let retries = 3;
       const modelsToTry = [
         process.env.GEMINI_MODEL,
         "gemini-3.6-flash",
         "gemini-2.0-flash",
-        "gemini-1.5-flash"
+        "gemini-1.5-flash",
       ].filter(Boolean) as string[];
       let modelIndex = 0;
-      
+
       while (retries > 0 && modelIndex < modelsToTry.length) {
         const currentModel = modelsToTry[modelIndex];
         try {
-          console.log(`Calling Gemini API with model: ${currentModel}`);
           const response = await ai.models.generateContent({
             model: currentModel,
             contents,
             config: {
-              systemInstruction: "You are ECHO (Evaluative Cognitive Heuristic Oracle), a Socratic AI tutor. Do not just give answers. Ask probing questions to reveal flaws in the student's logic or guide them to the answer themselves. Keep your responses concise (1-3 sentences).",
-            }
+              systemInstruction:
+                "You are ECHO (Evaluative Cognitive Heuristic Oracle), a Socratic AI tutor. Do not just give answers. Ask probing questions to reveal flaws in the student's logic or guide them to the answer themselves. Keep your responses concise (1-3 sentences).",
+            },
           });
           responseText = response.text || "";
           break;
         } catch (error: any) {
           retries--;
           const errorMessage = error.message || String(error);
-          
+
           // If model is deprecated or not available, cascade to next supported model
-          if (errorMessage.includes('not found') || errorMessage.includes('no longer available') || errorMessage.includes('deprecated') || errorMessage.includes('404')) {
-            console.warn(`Model ${currentModel} not available, cascading to next model...`);
+          if (
+            errorMessage.includes("not found") ||
+            errorMessage.includes("no longer available") ||
+            errorMessage.includes("deprecated") ||
+            errorMessage.includes("404")
+          ) {
+            console.warn(`[WARN] Model ${currentModel} not available, cascading to next model...`);
             modelIndex++;
             retries = 3;
             continue;
           }
 
           // Check for quota limits / 429s
-          if (errorMessage.toLowerCase().includes('quota') || errorMessage.includes('429')) {
-             console.log(`Gemini API Quota Exceeded (handled gracefully).`);
-             responseText = "*(Simulated Response - Free Quota Reached)* That is an interesting perspective. If we approach the problem from another angle, how might your conclusion change? (Please wait about 30 seconds before sending another real prompt).";
-             break;
+          if (errorMessage.toLowerCase().includes("quota") || errorMessage.includes("429")) {
+            console.warn(`[WARN] Gemini API Quota Exceeded (handled gracefully).`);
+            responseText =
+              "*(Simulated Response - Free Quota Reached)* That is an interesting perspective. If we approach the problem from another angle, how might your conclusion change? (Please wait about 30 seconds before sending another prompt).";
+            break;
           }
-
-          console.warn(`Gemini API Retry Warning (retries left: ${retries}):`, errorMessage);
 
           if (retries === 0 || modelIndex >= modelsToTry.length - 1) {
             let cleanMessage = errorMessage;
@@ -132,19 +230,18 @@ async function startServer() {
             } catch (e) {}
             throw new Error(cleanMessage);
           }
-          await new Promise(r => setTimeout(r, 1500));
+          await new Promise((r) => setTimeout(r, 1500));
         }
       }
 
-      console.log("Gemini API succeeded or used fallback, returning response");
       res.json({ text: responseText });
     } catch (error: any) {
-      console.error('Gemini API Final Error:', error);
-      res.status(500).json({ error: error.message || 'Failed to generate response' });
+      console.error("[ERROR] Gemini API Final Error:", error);
+      res.status(500).json({ error: error.message || "Failed to generate response" });
     }
   });
 
-  // Vite middleware for development
+  // Vite middleware for development or Static bundle serving for production
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -152,16 +249,37 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), 'dist');
+    const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    app.get("*", (_req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
     });
   }
 
-  httpServer.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
+  const server = httpServer.listen(PORT, "0.0.0.0", () => {
+    console.log(`[INFO] ECHO Server running on http://0.0.0.0:${PORT} in ${process.env.NODE_ENV || "development"} mode`);
   });
+
+  // Graceful Shutdown Lifecycle
+  const gracefulShutdown = (signal: string) => {
+    console.log(`[INFO] Received ${signal}. Starting graceful shutdown...`);
+    io.close(() => {
+      console.log("[INFO] Socket.io connections closed.");
+    });
+    server.close(() => {
+      console.log("[INFO] HTTP server closed cleanly. Exiting.");
+      process.exit(0);
+    });
+
+    // Force exit after 10s if connections fail to close
+    setTimeout(() => {
+      console.error("[WARN] Could not close connections in time, forcefully shutting down.");
+      process.exit(1);
+    }, 10000);
+  };
+
+  process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+  process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 }
 
 startServer();
