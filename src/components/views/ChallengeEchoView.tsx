@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Sparkles, BrainCircuit, ChevronDown, ChevronUp, ShieldAlert, Cpu } from 'lucide-react';
+import { Send, Bot, User, Sparkles, BrainCircuit, ChevronDown, ChevronUp, ShieldAlert, Cpu, Zap } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { cn } from '../../lib/utils';
+import { sound } from '../../lib/soundFx';
+import { triggerConfetti } from '../../lib/confetti';
 
 interface CognitiveTrace {
   stage: string;
@@ -19,6 +21,7 @@ export function ChallengeEchoView() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showXpPop, setShowXpPop] = useState(false);
   const [activeTrace, setActiveTrace] = useState<CognitiveTrace | null>({
     stage: "Physical Invariant Decomposition",
     hypothesis: "Mass proportionality in gravitational acceleration",
@@ -40,6 +43,7 @@ export function ChallengeEchoView() {
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
     
+    sound.playPop();
     const userText = input.trim();
     const updatedMessages = [...messages, { role: 'user', content: userText }];
     setMessages(updatedMessages);
@@ -96,6 +100,11 @@ export function ChallengeEchoView() {
                 next[next.length - 1] = { role: 'assistant', content: assistantText };
                 return next;
               });
+            } else if (parsed.type === 'done') {
+              // Sound celebration & XP popup on message finish
+              sound.playChime();
+              setShowXpPop(true);
+              setTimeout(() => setShowXpPop(false), 2600);
             } else if (parsed.type === 'error') {
               throw new Error(parsed.error);
             }
@@ -118,6 +127,9 @@ export function ChallengeEchoView() {
           next[next.length - 1] = { role: 'assistant', content: data.text || 'Connection re-established.' };
           return next;
         });
+        sound.playChime();
+        setShowXpPop(true);
+        setTimeout(() => setShowXpPop(false), 2600);
       } catch (err) {
         setMessages(prev => {
           const next = [...prev];
@@ -131,7 +143,16 @@ export function ChallengeEchoView() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto h-[calc(100vh-8rem)] flex flex-col fade-in">
+    <div className="max-w-4xl mx-auto h-[calc(100vh-8rem)] flex flex-col fade-in relative">
+      {/* Floating Animated XP Reward Notification */}
+      {showXpPop && (
+        <div className="absolute top-20 right-6 z-50 animate-in fade-in zoom-in slide-in-from-bottom-4 duration-300">
+          <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full shadow-[0_0_20px_rgba(245,158,11,0.5)] text-white font-bold text-sm tracking-wide">
+            <Zap className="w-4 h-4 animate-bounce" />
+            <span>+50 XP Socratic Insight!</span>
+          </div>
+        </div>
+      )}
       {/* Top Header */}
       <div className="mb-4 flex justify-between items-end shrink-0">
         <div>

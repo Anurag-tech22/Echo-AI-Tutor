@@ -1,12 +1,38 @@
-import React, { useState } from 'react';
-import { Atom, Flame, Zap, ChevronDown, User, LogOut, Settings } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Atom, Flame, Zap, ChevronDown, User, LogOut, Settings, Volume2, VolumeX, Sparkles } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useUI } from '../context/UIContext';
+import { sound } from '../lib/soundFx';
+import { triggerConfetti } from '../lib/confetti';
 
 export function Topbar() {
   const [showSubjectMenu, setShowSubjectMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isMuted, setIsMuted] = useState(sound.isMuted());
   const { openModal, showToast } = useUI();
+
+  useEffect(() => {
+    return sound.subscribe((muted) => setIsMuted(muted));
+  }, []);
+
+  const handleSoundToggle = () => {
+    const muted = sound.toggleMute();
+    setIsMuted(muted);
+    if (!muted) sound.playPop();
+    showToast(muted ? "Sound effects muted." : "Sound effects enabled.");
+  };
+
+  const handleXpClick = (e: React.MouseEvent) => {
+    sound.playVictory();
+    triggerConfetti(e.clientX, e.clientY, 100);
+    showToast("🎉 Level 4 Scholar! +150 XP bonus unlocked today!");
+  };
+
+  const handleStreakClick = (e: React.MouseEvent) => {
+    sound.playPop();
+    triggerConfetti(e.clientX, e.clientY, 60);
+    showToast("🔥 7-Day Socratic Streak! You're in the top 1% of active thinkers!");
+  };
 
   return (
     <header className="h-20 px-6 md:px-8 flex items-center justify-between shrink-0 border-b border-slate-800/30">
@@ -20,10 +46,10 @@ export function Topbar() {
       <div className="flex items-center gap-4 relative">
         <div className="relative">
           <button 
-            onClick={() => setShowSubjectMenu(!showSubjectMenu)}
+            onClick={() => { sound.playPop(); setShowSubjectMenu(!showSubjectMenu); }}
             className="hidden md:flex items-center bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-full px-4 py-2 transition-colors cursor-pointer"
           >
-            <Atom className="w-4 h-4 text-purple-400 mr-2" />
+            <Atom className="w-4 h-4 text-purple-400 mr-2 animate-spin-slow" />
             <span className="text-sm font-medium text-slate-200">Physics</span>
             <div className="ml-4 pl-4 border-l border-slate-700">
               <ChevronDown className={cn("w-4 h-4 text-slate-400 transition-transform", showSubjectMenu ? "rotate-180" : "")} />
@@ -34,19 +60,19 @@ export function Topbar() {
             <div className="absolute top-full right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-xl shadow-xl overflow-hidden z-50">
               <div className="p-2 space-y-1">
                 <button 
-                  onClick={() => { setShowSubjectMenu(false); showToast("Switched to Physics workspace."); }}
+                  onClick={() => { sound.playPop(); setShowSubjectMenu(false); showToast("Switched to Physics workspace."); }}
                   className="w-full text-left px-3 py-2 rounded-lg bg-slate-800 text-sm font-medium text-slate-200 flex items-center gap-2"
                 >
                   <Atom className="w-4 h-4 text-purple-400" /> Physics
                 </button>
                 <button 
-                  onClick={() => { setShowSubjectMenu(false); showToast("Switched to Mathematics workspace."); }}
+                  onClick={() => { sound.playPop(); setShowSubjectMenu(false); showToast("Switched to Mathematics workspace."); }}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/50 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors"
                 >
                   Mathematics
                 </button>
                 <button 
-                  onClick={() => { setShowSubjectMenu(false); showToast("Switched to Computer Science workspace."); }}
+                  onClick={() => { sound.playPop(); setShowSubjectMenu(false); showToast("Switched to Computer Science workspace."); }}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/50 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors"
                 >
                   Computer Science
@@ -57,8 +83,18 @@ export function Topbar() {
         </div>
 
         <div className="hidden sm:flex items-center gap-3">
+          {/* Sound FX Toggle Button */}
           <button
-            onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
+            onClick={handleSoundToggle}
+            className="p-2 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-full text-slate-400 hover:text-white transition-colors cursor-pointer"
+            title={isMuted ? "Unmute Sound FX" : "Mute Sound FX"}
+          >
+            {isMuted ? <VolumeX className="w-4 h-4 text-slate-500" /> : <Volume2 className="w-4 h-4 text-indigo-400" />}
+          </button>
+
+          {/* Quick Search */}
+          <button
+            onClick={() => { sound.playPop(); window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true })); }}
             className="hidden lg:flex items-center gap-2 bg-slate-900/90 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-full text-xs text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
             title="Global Command Center (Ctrl+K or Cmd+K)"
           >
@@ -73,14 +109,27 @@ export function Topbar() {
             <span>ECHO Core Online</span>
           </div>
 
-          <button onClick={() => showToast("You've earned 150 XP today!")} className="flex items-center gap-2 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-full px-4 py-2 transition-colors">
-            <Zap className="w-4 h-4 text-amber-400" />
-            <span className="text-sm font-medium text-slate-200">1200 XP</span>
+          {/* Gamified XP Button */}
+          <button 
+            onClick={handleXpClick} 
+            className="flex items-center gap-2 bg-slate-900 border border-amber-500/30 hover:border-amber-500/60 rounded-full px-4 py-2 transition-all cursor-pointer hover:scale-105 shadow-[0_0_15px_rgba(245,158,11,0.15)] group"
+            title="Click to celebrate XP progress!"
+          >
+            <Zap className="w-4 h-4 text-amber-400 group-hover:animate-bounce" />
+            <span className="text-sm font-semibold text-amber-300">1200 XP</span>
           </button>
           
-          <button onClick={() => showToast("Complete a simulation to extend your streak!")} className="flex items-center gap-2 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-full px-4 py-2 transition-colors">
-            <Flame className="w-4 h-4 text-orange-500" />
-            <span className="text-sm font-medium text-slate-200">7 Day Streak</span>
+          {/* Gamified Animated Fire Streak Button */}
+          <button 
+            onClick={handleStreakClick} 
+            className="flex items-center gap-2 bg-slate-900 border border-orange-500/30 hover:border-orange-500/60 rounded-full px-4 py-2 transition-all cursor-pointer hover:scale-105 shadow-[0_0_15px_rgba(249,115,22,0.15)] group"
+            title="Click to celebrate your 7-Day Streak!"
+          >
+            <div className="relative">
+              <Flame className="w-4 h-4 text-orange-500 animate-pulse" />
+              <span className="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-yellow-400 animate-ping" />
+            </div>
+            <span className="text-sm font-semibold text-orange-300">7 Day Streak</span>
           </button>
         </div>
 
