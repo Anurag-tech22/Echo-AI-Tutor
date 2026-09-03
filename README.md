@@ -268,8 +268,10 @@ echo/
 ├── LICENSE                     # Apache-2.0 open-source license
 ├── metadata.json               # Application capability metadata
 ├── package.json                # Project dependencies and npm scripts
+├── render.yaml                 # Render Blueprint deployment specification
 ├── SECURITY.md                 # Vulnerability disclosure policy
 ├── server.ts                   # Express + Socket.io + Gemini API server
+├── start.cjs                   # Resilient production runner with auto-build
 ├── tsconfig.json               # TypeScript compiler configuration
 └── vite.config.ts              # Vite + Tailwind CSS plugin config
 ```
@@ -325,6 +327,21 @@ To generate an optimized bundle and run the compiled server:
 npm run build
 npm start
 ```
+
+### 6. Deploy to Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com)
+
+ECHO is configured with a native [`render.yaml`](render.yaml) for zero-configuration deployments:
+1. Create a new **Web Service** on [Render](https://dashboard.render.com/) and connect this repository.
+2. Ensure the following service settings:
+   - **Build Command**: `bun install && bun run build` *(or `npm install && npm run build`)*
+   - **Start Command**: `bun run start` *(or `npm start`)*
+3. In the **Environment Variables** tab, add:
+   - `GEMINI_API_KEY`: Your Gemini API key from [Google AI Studio](https://aistudio.google.com/)
+   - `NODE_ENV`: `production`
+
+> **Note**: ECHO includes a resilient `start.cjs` runner that automatically builds the production bundle on the fly if `dist/server.cjs` is ever missing, guaranteeing zero-downtime startup.
 
 ---
 
